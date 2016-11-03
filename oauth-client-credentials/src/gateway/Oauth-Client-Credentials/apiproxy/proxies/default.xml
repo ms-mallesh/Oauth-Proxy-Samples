@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProxyEndpoint name="default">
+    <Flows>
+        <Flow name="GetAccessToken">
+            <!-- This policy flow is selected when the path exactly matches what's below -->
+            <Condition>proxy.pathsuffix MatchesPath "/accesstoken" and (request.verb = "POST")</Condition>
+            <Request>
+                <Step>
+                    <Name>GenerateAccessToken</Name>
+                </Step>
+            </Request>
+            <Response/>
+        </Flow>
+        <Flow name="ValidateAccessToken">
+            <Description/>
+            <Request>
+                <Step>
+                    <Name>OAuth-Verify-Token</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>return-valid-response</Name>
+                </Step>
+            </Response>
+            <Condition>(proxy.pathsuffix MatchesPath "/validatetoken") and (request.verb = "GET")</Condition>
+        </Flow>
+    </Flows>
+    <HTTPProxyConnection>
+        <!-- Add a base path to the proxy to distinguish from others in the environment -->
+        <BasePath>/v1/oauth/cc</BasePath>
+        <!-- Listen only on the HTTPS endpoint since OAuth 2.0 requires that -->
+        <VirtualHost>default</VirtualHost>
+    </HTTPProxyConnection>
+    <RouteRule name="NoRoute"/>
+    <PreFlow name="PreFlow">
+        <Request/>
+        <Response/>
+    </PreFlow>
+    <PostFlow name="PostFlow">
+        <Request/>
+        <Response/>
+    </PostFlow>
+</ProxyEndpoint>
